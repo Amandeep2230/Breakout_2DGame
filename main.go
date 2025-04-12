@@ -45,4 +45,6 @@ func main() {
 		set_scene()
 		rl.EndDrawing()
 	}
+
+	//testing push from other device
 }
