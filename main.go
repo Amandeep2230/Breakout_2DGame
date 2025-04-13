@@ -11,52 +11,78 @@ var brick_offset_y int16 = 2
 var window_width int16 = 622
 var window_height int16 = 800
 
-var paddle_width int16 = 80
-var paddle_height int16 = 30
-var paddle_x int16 = (window_width - paddle_width) / 2
-var paddle_y int16 = window_height - (paddle_height + 10)
-var paddle_vel int16 = 4
+type Paddle struct {
+	width  int16
+	height int16
+	x      int16
+	y      int16
+	vel    int16
+}
 
-var ball_size float32 = 10.0
-var ball_x int16 = window_width / 2
-var ball_y int16 = window_height - (paddle_height + 45)
-var ball_vel int16 = 4
+var paddle = Paddle{
+	width:  80,
+	height: 30,
+	x:      (window_width - 80) / 2,
+	y:      (window_height - 40),
+	vel:    4,
+}
+
+type Ball struct {
+	size float32
+	x    int16
+	y    int16
+	vel  int16
+}
+
+var ball = Ball{
+	size: 10.0,
+	x:    window_width / 2,
+	y:    window_height - 75,
+	vel:  4,
+}
 
 func ball_spawn() {
-	var ball_bottom int16 = ball_y + int16(ball_size)
+	var ball_ver int16 = ball.y + int16(ball.size)
+	//var ball_hor int16 = ball.x + int16(ball.size)
 
 	//ball behaviour
-	if ball_bottom >= window_height {
-		ball_vel = 0
-		ball_y = window_height - int16(ball_size)
+	if ball_ver <= 0 {
+		ball.vel = 4
 	}
 
-	ball_y += ball_vel
-	ball_vel += 1
+	var ball_position = rl.Vector2{float32(ball.x), float32(ball.y)}
+	var paddle_position = rl.Rectangle{float32(paddle.x), float32(paddle.y), float32(paddle.width), float32(paddle.height)}
 
-	rl.DrawCircle(int32(ball_x), int32(ball_y), ball_size, rl.Red)
+	if rl.CheckCollisionCircleRec(ball_position, ball.size, paddle_position) {
+		ball.vel = -4
+	}
+
+	ball.y += ball.vel
+	//ball.vel += 1
+
+	rl.DrawCircle(int32(ball.x), int32(ball.y), ball.size, rl.Red)
 }
 
 func paddle_spawn() {
-	var paddle_right int16 = paddle_x + paddle_width
+	var paddle_right int16 = paddle.x + paddle.width
 
-	rl.DrawRectangle(int32(paddle_x), int32(paddle_y), int32(paddle_width), int32(paddle_height), rl.Black)
+	rl.DrawRectangle(int32(paddle.x), int32(paddle.y), int32(paddle.width), int32(paddle.height), rl.Black)
 
 	//paddle behavior
 	if rl.IsKeyDown(rl.KeyLeft) {
-		paddle_x -= paddle_vel
+		paddle.x -= paddle.vel
 	}
 
 	if rl.IsKeyDown(rl.KeyRight) {
-		paddle_x += paddle_vel
+		paddle.x += paddle.vel
 	}
 
-	if paddle_x <= 0 {
-		paddle_x = 2
+	if paddle.x <= 0 {
+		paddle.x = 2
 	}
 
 	if paddle_right >= window_width {
-		paddle_x = window_width - (paddle_width + 2)
+		paddle.x = window_width - (paddle.width + 2)
 	}
 
 }
