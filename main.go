@@ -10,6 +10,9 @@ var brick_offset_x int16 = 2
 var brick_offset_y int16 = 2
 var window_width int16 = 622
 var window_height int16 = 800
+var rows int = 8
+var cols int = 10
+var padding int = 2
 
 type Paddle struct {
 	width  int16
@@ -20,11 +23,11 @@ type Paddle struct {
 }
 
 var paddle = Paddle{
-	width:  80,
-	height: 30,
+	width:  120,
+	height: 20,
 	x:      (window_width - 80) / 2,
 	y:      (window_height - 40),
-	vel:    4,
+	vel:    7,
 }
 
 type Ball struct {
@@ -42,6 +45,15 @@ var ball = Ball{
 	vel_y: 4,
 	vel_x: 0,
 }
+
+type Brick struct {
+	pos    rl.Vector2
+	width  float32
+	height float32
+	hit    bool
+}
+
+var bricks [][]Brick = create_bricks(2.0, 100.0, 2.0)
 
 func ball_spawn() {
 	var ball_ver int16 = ball.y + int16(ball.size)
@@ -117,15 +129,84 @@ func paddle_spawn() {
 
 }
 
-func set_scene() {
-	rl.ClearBackground(rl.RayWhite)
+func create_bricks(startX, startY, padding float32) [][]Brick {
 
-	for pos_x := 2; pos_x < int(window_width-2); pos_x += int(brick_width + brick_offset_x) {
-		for pos_y := 100; pos_y < int((window_height-2)/2); pos_y += int(brick_height + brick_offset_y) {
-			rl.DrawRectangle(int32(pos_x), int32(pos_y), int32(brick_width), int32(brick_height), rl.DarkGray)
+	grid := make([][]Brick, rows)
+	for i := 0; i < rows; i++ {
+		row := make([]Brick, cols)
+		for j := 0; j < cols; j++ {
+			x := 2 + (int16(j) * (brick_width + int16(padding)))
+			y := 100 + (int16(i) * (brick_height + int16(padding)))
+
+			row[j] = Brick{
+				pos:    rl.NewVector2(float32(x), float32(y)),
+				width:  float32(brick_width),
+				height: float32(brick_height),
+				hit:    true,
+			}
+		}
+		grid[i] = row
+	}
+	return grid
+
+}
+
+func brick_spawn() {
+
+	for _, row := range bricks {
+		for _, brick := range row {
+			if brick.hit {
+				rl.DrawRectangle(
+					int32(brick.pos.X),
+					int32(brick.pos.Y),
+					int32(brick.width),
+					int32(brick.height),
+					rl.Black)
+			}
 		}
 	}
 
+	checkBrickCollision()
+
+}
+
+func checkBrickCollision() {
+	//ball collision behavior with bricks
+	var ball_position = rl.Vector2{float32(ball.x), float32(ball.y)}
+
+	for i := range bricks {
+		for j := range bricks[i] {
+			brick := &bricks[i][j]
+			if brick.hit {
+				brick_position := rl.NewRectangle(brick.pos.X, brick.pos.Y, brick.width, brick.height)
+				if rl.CheckCollisionCircleRec(ball_position, ball.size, brick_position) {
+					brick.hit = false
+					//determine point of contact with paddle
+					var hitPos float32 = float32(ball.x) - float32(brick.pos.X)
+					//convert the contact into range between -0.5 and 0.5
+					var relHit float32 = (hitPos / float32(brick.width)) - 0.5
+
+					//ball behavior after collision
+					if (-0.5 <= relHit) && (relHit < -0.1) {
+						ball.vel_y = 6
+						ball.vel_x = -6
+					} else if (-0.1 <= relHit) && (relHit < 0.2) {
+						ball.vel_y = 6
+						ball.vel_x = 1
+					} else if 0.2 <= relHit && relHit <= 0.5 {
+						ball.vel_y = 6
+						ball.vel_x = 6
+					}
+				}
+			}
+		}
+	}
+}
+
+func set_scene() {
+	rl.ClearBackground(rl.RayWhite)
+
+	brick_spawn()
 	paddle_spawn()
 	ball_spawn()
 }
