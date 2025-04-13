@@ -48,17 +48,19 @@ func ball_spawn() {
 	var ball_hor int16 = ball.x + int16(ball.size)
 
 	//ball behaviour
-	if ball_ver <= 1 {
+	if ball_ver <= int16(ball.size) {
 		ball.vel_y = 4
 	}
 
-	if ball_hor <= 1 {
+	if ball_hor <= int16(ball.size) {
 		ball.vel_x = 4
 	} else if ball_hor >= window_width {
 		ball.vel_x = -4
 	}
 
+	//determine point of contact with paddle
 	var hitPos float32 = float32(ball.x) - float32(paddle.x)
+	//convert the contact into range between -0.5 and 0.5
 	var relHit float32 = (hitPos / float32(paddle.width)) - 0.5
 
 	var ball_position = rl.Vector2{float32(ball.x), float32(ball.y)}
@@ -87,7 +89,6 @@ func ball_spawn() {
 
 	ball.y += ball.vel_y
 	ball.x += ball.vel_x
-	//ball.vel += 1
 
 	rl.DrawCircle(int32(ball.x), int32(ball.y), ball.size, rl.Red)
 }
