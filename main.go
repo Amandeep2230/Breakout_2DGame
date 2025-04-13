@@ -28,36 +28,65 @@ var paddle = Paddle{
 }
 
 type Ball struct {
-	size float32
-	x    int16
-	y    int16
-	vel  int16
+	size  float32
+	x     int16
+	y     int16
+	vel_x int16
+	vel_y int16
 }
 
 var ball = Ball{
-	size: 10.0,
-	x:    window_width / 2,
-	y:    window_height - 75,
-	vel:  4,
+	size:  10.0,
+	x:     window_width / 2,
+	y:     window_height - 75,
+	vel_y: 4,
+	vel_x: 0,
 }
 
 func ball_spawn() {
 	var ball_ver int16 = ball.y + int16(ball.size)
-	//var ball_hor int16 = ball.x + int16(ball.size)
+	var ball_hor int16 = ball.x + int16(ball.size)
 
 	//ball behaviour
-	if ball_ver <= 0 {
-		ball.vel = 4
+	if ball_ver <= 1 {
+		ball.vel_y = 4
 	}
+
+	if ball_hor <= 1 {
+		ball.vel_x = 4
+	} else if ball_hor >= window_width {
+		ball.vel_x = -4
+	}
+
+	var hitPos float32 = float32(ball.x) - float32(paddle.x)
+	var relHit float32 = (hitPos / float32(paddle.width)) - 0.5
 
 	var ball_position = rl.Vector2{float32(ball.x), float32(ball.y)}
 	var paddle_position = rl.Rectangle{float32(paddle.x), float32(paddle.y), float32(paddle.width), float32(paddle.height)}
 
 	if rl.CheckCollisionCircleRec(ball_position, ball.size, paddle_position) {
-		ball.vel = -4
+
+		if (-0.5 <= relHit) && (relHit < -0.3) {
+			ball.vel_y = -4
+			ball.vel_x = -4
+		} else if (-0.3 <= relHit) && (relHit < -0.1) {
+			ball.vel_y = -4
+			ball.vel_x = -2
+		} else if -0.1 <= relHit && relHit < 0.1 {
+			ball.vel_y = -4
+			ball.vel_x = 0
+		} else if 0.1 <= relHit && relHit < 0.3 {
+			ball.vel_y = -4
+			ball.vel_x = 2
+		} else if 0.3 <= relHit && relHit <= 0.5 {
+			ball.vel_y = -4
+			ball.vel_x = 4
+		}
+
 	}
 
-	ball.y += ball.vel
+	ball.y += ball.vel_y
+	ball.x += ball.vel_x
 	//ball.vel += 1
 
 	rl.DrawCircle(int32(ball.x), int32(ball.y), ball.size, rl.Red)
