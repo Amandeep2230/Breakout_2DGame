@@ -34,4 +34,12 @@ This project helped me:
 ### Installation
 
 1. Clone the repository:
-   
+
+   ```
+   https://github.com/Amandeep2230/Breakout_2DGame.git
+   ```
+2. Go to the project folder and run the game:
+
+   ```
+   go run .
+   ```
