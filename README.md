@@ -30,6 +30,12 @@ This project helped me:
 - Setting up the **initial game scene**, props, and layout
 - Keeping gameplay smooth while managing multiple interactions per frame
 
+## 📦 Future Improvements
+
+- Add levels
+- Sound effects and background music
+- Power-ups (e.g., multi-ball, paddle extension)
+- UI/UX polish and animations
 
 ### Installation
 
@@ -43,13 +49,6 @@ This project helped me:
    ```
    go run .
    ```
-
-## 📦 Future Improvements
-
-- Add levels
-- Sound effects and background music
-- Power-ups (e.g., multi-ball, paddle extension)
-- UI/UX polish and animations
 
 Happy Breaking Bricks!
 
