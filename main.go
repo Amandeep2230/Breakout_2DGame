@@ -11,10 +11,12 @@ var brick_height int16 = 20
 var brick_offset_x int16 = 2
 var brick_offset_y int16 = 2
 var window_width int16 = 622
-var window_height int16 = 800
-var rows int = 8
+var window_height int16 = 700
+var rows int = 6
 var cols int = 10
 var padding int = 2
+var gameOver bool = false
+var gameCompleted bool = false
 
 type Paddle struct {
 	width  int16
@@ -29,7 +31,7 @@ var paddle = Paddle{
 	height: 20,
 	x:      (window_width - 80) / 2,
 	y:      (window_height - 40),
-	vel:    7,
+	vel:    9,
 }
 
 type Ball struct {
@@ -44,7 +46,7 @@ var ball = Ball{
 	size:  10.0,
 	x:     window_width / 2,
 	y:     window_height - 75,
-	vel_y: 4,
+	vel_y: 6,
 	vel_x: 0,
 }
 
@@ -57,6 +59,7 @@ type Brick struct {
 
 var bricks [][]Brick = create_bricks(2.0, 100.0, 2.0)
 var score int
+var max_score int = len(bricks) * len(bricks[1])
 
 func ball_spawn() {
 	var ball_ver int16 = ball.y + int16(ball.size)
@@ -64,13 +67,18 @@ func ball_spawn() {
 
 	//ball behaviour
 	if ball_ver <= int16(ball.size) {
-		ball.vel_y = 4
+		ball.vel_y = 6
 	}
 
 	if ball_hor <= int16(ball.size) {
-		ball.vel_x = 4
+		ball.vel_x = 6
 	} else if ball_hor >= window_width {
-		ball.vel_x = -4
+		ball.vel_x = -6
+	}
+
+	//end game if ball misses the paddle
+	if ball_ver >= window_height {
+		gameOver = true
 	}
 
 	//determine point of contact with paddle
@@ -84,20 +92,20 @@ func ball_spawn() {
 	if rl.CheckCollisionCircleRec(ball_position, ball.size, paddle_position) {
 
 		if (-0.5 <= relHit) && (relHit < -0.3) {
-			ball.vel_y = -4
-			ball.vel_x = -4
+			ball.vel_y = -6
+			ball.vel_x = -6
 		} else if (-0.3 <= relHit) && (relHit < -0.1) {
-			ball.vel_y = -4
-			ball.vel_x = -2
+			ball.vel_y = -6
+			ball.vel_x = -4
 		} else if -0.1 <= relHit && relHit < 0.1 {
-			ball.vel_y = -4
+			ball.vel_y = -6
 			ball.vel_x = 0
 		} else if 0.1 <= relHit && relHit < 0.3 {
-			ball.vel_y = -4
-			ball.vel_x = 2
-		} else if 0.3 <= relHit && relHit <= 0.5 {
-			ball.vel_y = -4
+			ball.vel_y = -6
 			ball.vel_x = 4
+		} else if 0.3 <= relHit && relHit <= 0.5 {
+			ball.vel_y = -6
+			ball.vel_x = 6
 		}
 
 	}
@@ -201,6 +209,12 @@ func checkBrickCollision() {
 						ball.vel_x = 6
 					}
 					score += 1
+
+					if score == max_score {
+						gameCompleted = true
+					} else {
+						continue
+					}
 				}
 			}
 		}
@@ -236,7 +250,17 @@ func main() {
 		if !started {
 			rl.DrawText("Please press space key to start", int32(window_width/4), int32(window_height/2), 20, rl.Gray)
 		} else {
-			set_scene()
+			if !gameOver {
+				if !gameCompleted {
+					set_scene()
+				} else {
+					rl.DrawText("Game Completed!", int32(window_width/4)+20, int32(window_height/2), 40, rl.Gray)
+					rl.DrawText("Thank you for playing!", int32(window_width/3), int32(window_height/2)+50, 20, rl.Gray)
+				}
+			} else {
+				rl.DrawText("Game Over!", int32(window_width/3), int32(window_height/2), 40, rl.Gray)
+				rl.DrawText(fmt.Sprintf("Final Score: %d", score), int32(window_width/3)+40, int32(window_height/2)+50, 20, rl.Gray)
+			}
 		}
 		rl.EndDrawing()
 	}
