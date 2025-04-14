@@ -43,3 +43,14 @@ This project helped me:
    ```
    go run .
    ```
+
+## 📦 Future Improvements
+
+- Add levels
+- Sound effects and background music
+- Power-ups (e.g., multi-ball, paddle extension)
+- UI/UX polish and animations
+
+Happy Breaking Bricks!
+
+Cheers!
