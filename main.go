@@ -193,21 +193,35 @@ func checkBrickCollision() {
 				if rl.CheckCollisionCircleRec(ball_position, ball.size, brick_position) {
 					brick.hit = false
 					//determine point of contact with paddle
-					var hitPos float32 = float32(ball.x) - float32(brick.pos.X)
+					var hitPosX float32 = float32(ball.x) - float32(brick.pos.X)
 					//convert the contact into range between -0.5 and 0.5
-					var relHit float32 = (hitPos / float32(brick.width)) - 0.5
+					var relHitX float32 = (hitPosX / float32(brick.width)) - 0.5
 
 					//ball behavior after collision
-					if (-0.5 <= relHit) && (relHit < -0.1) {
-						ball.vel_y = 6
-						ball.vel_x = -6
-					} else if (-0.1 <= relHit) && (relHit < 0.2) {
-						ball.vel_y = 6
-						ball.vel_x = 1
-					} else if 0.2 <= relHit && relHit <= 0.5 {
-						ball.vel_y = 6
-						ball.vel_x = 6
+					if ball.y >= int16(brick.pos.Y) {
+						if (-0.5 <= relHitX) && (relHitX < -0.1) {
+							ball.vel_y = 6
+							ball.vel_x = -6
+						} else if (-0.1 <= relHitX) && (relHitX < 0.2) {
+							ball.vel_y = 6
+							ball.vel_x = 1
+						} else if 0.2 <= relHitX && relHitX <= 0.5 {
+							ball.vel_y = 6
+							ball.vel_x = 6
+						}
+					} else {
+						if (-0.5 <= relHitX) && (relHitX < -0.1) {
+							ball.vel_y = -6
+							ball.vel_x = -6
+						} else if (-0.1 <= relHitX) && (relHitX < 0.2) {
+							ball.vel_y = -6
+							ball.vel_x = 1
+						} else if 0.2 <= relHitX && relHitX <= 0.5 {
+							ball.vel_y = -6
+							ball.vel_x = 6
+						}
 					}
+
 					score += 1
 
 					if score == max_score {
