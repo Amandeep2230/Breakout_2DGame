@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -54,6 +56,7 @@ type Brick struct {
 }
 
 var bricks [][]Brick = create_bricks(2.0, 100.0, 2.0)
+var score int
 
 func ball_spawn() {
 	var ball_ver int16 = ball.y + int16(ball.size)
@@ -197,6 +200,7 @@ func checkBrickCollision() {
 						ball.vel_y = 6
 						ball.vel_x = 6
 					}
+					score += 1
 				}
 			}
 		}
@@ -204,11 +208,12 @@ func checkBrickCollision() {
 }
 
 func set_scene() {
-	rl.ClearBackground(rl.RayWhite)
 
+	rl.DrawText(fmt.Sprintf("Score: %d", score), 2, 2, 20, rl.Black)
 	brick_spawn()
 	paddle_spawn()
 	ball_spawn()
+
 }
 
 func main() {
@@ -217,9 +222,22 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
+	started := false
+
 	for !rl.WindowShouldClose() {
+
+		if rl.IsKeyPressed(rl.KeySpace) {
+			started = true
+		}
+
 		rl.BeginDrawing()
-		set_scene()
+		rl.ClearBackground(rl.RayWhite)
+
+		if !started {
+			rl.DrawText("Please press space key to start", int32(window_width/4), int32(window_height/2), 20, rl.Gray)
+		} else {
+			set_scene()
+		}
 		rl.EndDrawing()
 	}
 
