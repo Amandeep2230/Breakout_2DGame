@@ -6,15 +6,18 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+// vars for bricks
 var brick_width int16 = 60
 var brick_height int16 = 20
-var brick_offset_x int16 = 2
-var brick_offset_y int16 = 2
-var window_width int16 = 622
-var window_height int16 = 700
 var rows int = 6
 var cols int = 10
 var padding int = 2
+
+// vars for window setting
+var window_width int16 = 622
+var window_height int16 = 700
+
+// bool vars for game flow
 var gameOver bool = false
 var gameCompleted bool = false
 
@@ -61,6 +64,7 @@ var bricks [][]Brick = create_bricks(2.0, 100.0, 2.0)
 var score int
 var max_score int = len(bricks) * len(bricks[1])
 
+// render the ball
 func ball_spawn() {
 	var ball_ver int16 = ball.y + int16(ball.size)
 	var ball_hor int16 = ball.x + int16(ball.size)
@@ -89,6 +93,7 @@ func ball_spawn() {
 	var ball_position = rl.Vector2{float32(ball.x), float32(ball.y)}
 	var paddle_position = rl.Rectangle{float32(paddle.x), float32(paddle.y), float32(paddle.width), float32(paddle.height)}
 
+	//if ball collides with the paddle
 	if rl.CheckCollisionCircleRec(ball_position, ball.size, paddle_position) {
 
 		if (-0.5 <= relHit) && (relHit < -0.3) {
@@ -116,6 +121,7 @@ func ball_spawn() {
 	rl.DrawCircle(int32(ball.x), int32(ball.y), ball.size, rl.Red)
 }
 
+// render the paddle
 func paddle_spawn() {
 	var paddle_right int16 = paddle.x + paddle.width
 
@@ -140,6 +146,7 @@ func paddle_spawn() {
 
 }
 
+// creating the bricks in 2D matrix
 func create_bricks(startX, startY, padding float32) [][]Brick {
 
 	grid := make([][]Brick, rows)
@@ -162,6 +169,7 @@ func create_bricks(startX, startY, padding float32) [][]Brick {
 
 }
 
+// rendering the bricks in the scene
 func brick_spawn() {
 
 	for _, row := range bricks {
@@ -181,6 +189,7 @@ func brick_spawn() {
 
 }
 
+// ball behavior on colliding with the bricks
 func checkBrickCollision() {
 	//ball collision behavior with bricks
 	var ball_position = rl.Vector2{float32(ball.x), float32(ball.y)}
@@ -235,6 +244,7 @@ func checkBrickCollision() {
 	}
 }
 
+// base function to setup the scene
 func set_scene() {
 
 	rl.DrawText(fmt.Sprintf("Score: %d", score), 2, 2, 20, rl.Black)
@@ -244,6 +254,7 @@ func set_scene() {
 
 }
 
+// main function
 func main() {
 	rl.InitWindow(int32(window_width), int32(window_height), "Breakout - 2D Game using Go")
 	defer rl.CloseWindow()
@@ -254,6 +265,7 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 
+		//checks status of game - started
 		if rl.IsKeyPressed(rl.KeySpace) {
 			started = true
 		}
@@ -261,22 +273,27 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 
+		// displays message to start the game
 		if !started {
 			rl.DrawText("Please press space key to start", int32(window_width/4), int32(window_height/2), 20, rl.Gray)
+			rl.DrawText("Developed by Amandeep Bhalla", int32(window_width/3), int32(window_height/2)+25, 15, rl.Gray)
 		} else {
+			//check if game is in progress - not over
 			if !gameOver {
+				// checks if game is in progress - not completed
 				if !gameCompleted {
 					set_scene()
 				} else {
+					// game completed screen
 					rl.DrawText("Game Completed!", int32(window_width/4)+20, int32(window_height/2), 40, rl.Gray)
 					rl.DrawText("Thank you for playing!", int32(window_width/3), int32(window_height/2)+50, 20, rl.Gray)
 				}
 			} else {
+				//game over screen
 				rl.DrawText("Game Over!", int32(window_width/3), int32(window_height/2), 40, rl.Gray)
 				rl.DrawText(fmt.Sprintf("Final Score: %d", score), int32(window_width/3)+40, int32(window_height/2)+50, 20, rl.Gray)
 			}
 		}
 		rl.EndDrawing()
 	}
-
 }
