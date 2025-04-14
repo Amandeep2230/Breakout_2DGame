@@ -2,7 +2,7 @@
 
 A modern remake of the classic **Breakout** arcade game developed using **GoLang** and the **Raylib** game development library. This project was built as a personal learning exercise to explore the fundamentals of 2D game development.
 
-<img src="breakout.gif" alt="Breakout Demo" width="300"/>
+<img src="breakout.gif" alt="Breakout Demo" width="450"/>
 
 
 ## 🎮 About the Game
